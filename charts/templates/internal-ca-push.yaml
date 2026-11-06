@@ -1,0 +1,31 @@
+{{- if .Values.internalCA.pushToInfisical }}
+{{- if not .Values.internalCA.enabled }}
+{{- fail "internalCA.enabled is required when internalCA.pushToInfisical is true" }}
+{{- end }}
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalPushSecret
+metadata:
+  name: infisical-push-secret-{{ required "internalCA.name is required when internalCA.pushToInfisical is true" .Values.internalCA.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "global-certs-wrapper.labels" . | nindent 4 }}
+spec:
+  hostAPI: {{ required "infisical.push.hostAPI is required when internalCA.pushToInfisical is true" .Values.infisical.push.hostAPI | quote }}
+  authentication:
+    universalAuth:
+      credentialsRef:
+        secretName: {{ required "infisical.push.credentialsRef.name is required when internalCA.pushToInfisical is true" .Values.infisical.push.credentialsRef.name | quote }}
+        secretNamespace: {{ required "infisical.push.credentialsRef.namespace is required when internalCA.pushToInfisical is true" .Values.infisical.push.credentialsRef.namespace | quote }}
+  resyncInterval: 1m
+  updatePolicy: Replace
+  destination:
+    projectSlug: {{ required "infisical.projectSlug is required when internalCA.pushToInfisical is true" .Values.infisical.projectSlug | quote }}
+    environmentSlug: {{ required "infisical.environmentSlug is required when internalCA.pushToInfisical is true" .Values.infisical.environmentSlug | quote }}
+    secretsPath: {{ required "internalCA.secretPath is required when internalCA.pushToInfisical is true" .Values.internalCA.secretPath | quote }}
+  push:
+    secret:
+      secretName: {{ required "internalCA.secretName is required when internalCA.pushToInfisical is true" .Values.internalCA.secretName | quote }}
+      secretNamespace: {{ .Release.Namespace }}
+      template:
+        includeAllSecrets: true
+{{- end }}

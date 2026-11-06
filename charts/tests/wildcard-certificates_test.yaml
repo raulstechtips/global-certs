@@ -1,0 +1,38 @@
+suite: Wildcard certificates
+templates:
+  - templates/wildcard-certificates.yaml
+release:
+  name: global-certs
+  namespace: cert-manager
+tests:
+  - it: is empty by default
+    asserts:
+      - hasDocuments: {count: 0}
+  - it: renders each domain and preserves issuer selection
+    values: [../ci/all-on-values.yaml]
+    asserts:
+      - hasDocuments: {count: 2}
+      - equal:
+          path: spec
+          value:
+            commonName: '*.example.test'
+            dnsNames: [example.test, '*.example.test']
+            secretName: fake-production-tls
+            issuerRef: {name: fake-production-issuer, kind: ClusterIssuer}
+            secretTemplate:
+              annotations:
+                reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+                reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: fake-stage
+        documentIndex: 1
+      - equal:
+          path: spec.issuerRef.name
+          value: fake-staging-issuer
+        documentIndex: 1
+      - equal:
+          path: spec.dnsNames
+          value: [stage.example.test, '*.stage.example.test']
+        documentIndex: 1
