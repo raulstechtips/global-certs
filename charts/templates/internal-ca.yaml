@@ -1,0 +1,21 @@
+{{- if .Values.internalCA.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ required "internalCA.name is required when internalCA.enabled is true" .Values.internalCA.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "global-certs-wrapper.labels" . | nindent 4 }}
+spec:
+  isCA: true
+  commonName: {{ required "internalCA.commonName is required when internalCA.enabled is true" .Values.internalCA.commonName | quote }}
+  secretName: {{ required "internalCA.secretName is required when internalCA.enabled is true" .Values.internalCA.secretName }}
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: {{ required "internalCA.issuer is required when internalCA.enabled is true" .Values.internalCA.issuer }}
+    kind: ClusterIssuer
+  secretTemplate:
+    {{- toYaml .Values.secretTemplate | nindent 4 }}
+{{- end }}

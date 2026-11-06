@@ -1,0 +1,26 @@
+# Fixed cluster-wide CA identity; resources stay off until explicitly enabled.
+internalCA:
+  enabled: false
+  name: raulstechtips-internal-ca
+  secretName: raulstechtips-internal-ca-key-pair
+  commonName: k8s-internal-ca.cluster.local
+  issuer: selfsigned-issuer
+  pushToInfisical: false
+  secretPath: /certificates/internal
+
+wildcardCertificates: []
+
+# Both the CA and public certificates retain the live reflector behavior.
+secretTemplate:
+  annotations:
+    reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+    reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+
+infisical:
+  projectSlug: ""
+  environmentSlug: ""
+  push:
+    hostAPI: ""
+    credentialsRef:
+      name: ""
+      namespace: ""

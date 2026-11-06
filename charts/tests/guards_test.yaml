@@ -1,0 +1,116 @@
+suite: Required values and schema guards
+templates:
+  - templates/internal-ca.yaml
+  - templates/internal-ca-push.yaml
+tests:
+  - it: rejects an enabled CA without name
+    template: templates/internal-ca.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      internalCA.name: ""
+      internalCA.pushToInfisical: false
+    asserts:
+      - failedTemplate:
+          errorMessage: internalCA.name is required when internalCA.enabled is true
+  - it: rejects an enabled CA without commonName
+    template: templates/internal-ca.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      internalCA.commonName: ""
+      internalCA.pushToInfisical: false
+    asserts:
+      - failedTemplate:
+          errorMessage: internalCA.commonName is required when internalCA.enabled is true
+  - it: rejects an enabled CA without secretName
+    template: templates/internal-ca.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      internalCA.secretName: ""
+      internalCA.pushToInfisical: false
+    asserts:
+      - failedTemplate:
+          errorMessage: internalCA.secretName is required when internalCA.enabled is true
+  - it: rejects an enabled CA without issuer
+    template: templates/internal-ca.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      internalCA.issuer: ""
+      internalCA.pushToInfisical: false
+    asserts:
+      - failedTemplate:
+          errorMessage: internalCA.issuer is required when internalCA.enabled is true
+  - it: rejects export without infisical.push.hostAPI
+    template: templates/internal-ca-push.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      infisical.push.hostAPI: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: infisical.push.hostAPI is required when internalCA.pushToInfisical is true
+  - it: rejects export without infisical.push.credentialsRef.name
+    template: templates/internal-ca-push.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      infisical.push.credentialsRef.name: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: infisical.push.credentialsRef.name is required when internalCA.pushToInfisical is true
+  - it: rejects export without infisical.push.credentialsRef.namespace
+    template: templates/internal-ca-push.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      infisical.push.credentialsRef.namespace: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: infisical.push.credentialsRef.namespace is required when internalCA.pushToInfisical is true
+  - it: rejects export without infisical.projectSlug
+    template: templates/internal-ca-push.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      infisical.projectSlug: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: infisical.projectSlug is required when internalCA.pushToInfisical is true
+  - it: rejects export without infisical.environmentSlug
+    template: templates/internal-ca-push.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      infisical.environmentSlug: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: infisical.environmentSlug is required when internalCA.pushToInfisical is true
+  - it: rejects export without internalCA.secretPath
+    template: templates/internal-ca-push.yaml
+    values: [../ci/all-on-values.yaml]
+    set:
+      internalCA.secretPath: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: internalCA.secretPath is required when internalCA.pushToInfisical is true
+  - it: rejects export without an enabled CA
+    template: templates/internal-ca-push.yaml
+    set:
+      internalCA.pushToInfisical: true
+    asserts:
+      - failedTemplate:
+          errorMessage: internalCA.enabled is required when internalCA.pushToInfisical is true
+  - it: rejects unknown wrapper keys
+    template: templates/internal-ca.yaml
+    set:
+      internalCA.typo: true
+    asserts:
+      - failedTemplate:
+          errorMessage: |
+            values don't meet the specifications of the schema(s) in the following chart(s):
+            global-certs:
+            - internalCA: Additional property typo is not allowed
+  - it: rejects string booleans
+    template: templates/internal-ca.yaml
+    set:
+      internalCA.enabled: "true"
+    asserts:
+      - failedTemplate:
+          errorMessage: |
+            values don't meet the specifications of the schema(s) in the following chart(s):
+            global-certs:
+            - internalCA.enabled: Invalid type. Expected: boolean, given: string

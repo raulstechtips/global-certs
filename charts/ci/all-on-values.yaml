@@ -1,0 +1,24 @@
+internalCA:
+  enabled: true
+  name: fake-internal-ca
+  secretName: fake-internal-ca-key-pair
+  commonName: ca.example.test
+  issuer: fake-selfsigned-issuer
+  pushToInfisical: true
+wildcardCertificates:
+  - name: fake-production
+    secretName: fake-production-tls
+    domain: example.test
+    issuer: fake-production-issuer
+  - name: fake-stage
+    secretName: fake-stage-tls
+    domain: stage.example.test
+    issuer: fake-staging-issuer
+infisical:
+  projectSlug: fake-project
+  environmentSlug: fake-environment
+  push:
+    hostAPI: https://infisical.example.test/api
+    credentialsRef:
+      name: fake-universal-auth
+      namespace: fake-infisical

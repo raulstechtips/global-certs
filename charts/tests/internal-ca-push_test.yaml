@@ -1,0 +1,37 @@
+suite: Internal CA export
+templates:
+  - templates/internal-ca-push.yaml
+release:
+  name: global-certs
+  namespace: cert-manager
+tests:
+  - it: is disabled by default
+    asserts:
+      - hasDocuments: {count: 0}
+  - it: exports the complete CA secret through universal authentication
+    values: [../ci/all-on-values.yaml]
+    asserts:
+      - isKind: {of: InfisicalPushSecret}
+      - equal:
+          path: metadata.name
+          value: infisical-push-secret-fake-internal-ca
+      - equal:
+          path: spec
+          value:
+            hostAPI: https://infisical.example.test/api
+            authentication:
+              universalAuth:
+                credentialsRef:
+                  secretName: fake-universal-auth
+                  secretNamespace: fake-infisical
+            resyncInterval: 1m
+            updatePolicy: Replace
+            destination:
+              projectSlug: fake-project
+              environmentSlug: fake-environment
+              secretsPath: /certificates/internal
+            push:
+              secret:
+                secretName: fake-internal-ca-key-pair
+                secretNamespace: cert-manager
+                template: {includeAllSecrets: true}

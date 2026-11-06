@@ -1,0 +1,11 @@
+project-config:
+  project-name: global-certs
+  project-description: "Helm chart for shared certificates and internal CA export"
+  project-namespace: cert-manager
+  publish-targets: [ghcr]
+  pipeline-steps:
+    helm-test: true
+    trivy-scan: true
+    opengrep-scan: true
+    helm-package-upload: true
+    argo-deploy: true
